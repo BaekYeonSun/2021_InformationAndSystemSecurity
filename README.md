@@ -7,3 +7,7 @@
 20191604 백연선
 GitHub : https://github.com/BaekYeonSun
 ```
+```
+20191670 조나영
+GitHub : https://github.com/NaYoung2253
+```
