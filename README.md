@@ -14,3 +14,8 @@ GitHub : https://github.com/NaYoung2253
 ```
 20202096 원채은
 GitHub : https://github.com/chaeeun3
+```
+```
+20191313 채지윤
+GitHub : https://github.com/jiyoony
+```
