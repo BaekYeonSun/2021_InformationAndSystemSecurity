@@ -6,9 +6,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import LinearSVC
 from sklearn.tree import DecisionTreeClassifier
 from lightgbm import LGBMClassifier
+import lightgbm as lgb
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.metrics import accuracy_score, f1_score
-
+from lightgbm import plot_importance
+# import matplotlib.pyplot as plt
+# %matplotlib inline
 
 def parsing(path):
     with open(path, 'r', encoding='utf-8') as f: # 파일 열기
@@ -21,7 +24,6 @@ def parsing(path):
                 
             if line.startswith("GET"): # GET 부분
                 para += line
-#                 print("Get/", para)
                 data.append(para)
                 para = ""
             
@@ -31,14 +33,11 @@ def parsing(path):
                 l = ""
                 while not l.startswith("Content-Length"):
                     l = f.readline()
-#                     print("Post/", l)
                 l = f.readline()
                 l = f.readline()
                 para += l
                 data.append(para)
                 para = ""
-        
-#     print(data)
                     
     return data
 
@@ -65,23 +64,47 @@ def vectorize(train_x,test_x):
 
 def train(train_vec, train_y, select):
     if select == "Random Forest":
-        model = RandomForestClassifier()
+        model = RandomForestClassifier(n_estimators=100, max_depth=350)
         model.fit(train_vec, train_y)
+
     elif select == "SVM":
         model = LinearSVC(C=1)
         model.fit(train_vec, train_y)
+
     elif select == "Decision Tree":
-        model = DecisionTreeClassifier()
+        model = DecisionTreeClassifier(random_state=156)
         model.fit(train_vec, train_y)
+
     elif select == "LigthGBM":
-        model = LGBMClassifier()
+        model = LGBMClassifier(learning_rate=0.1, 
+                                n_estimators=1000, 
+                                max_bin=300,
+                                num_leaves=35)
         model.fit(train_vec, train_y)
+        # boosting_type은 goss, dart보다 default(gbdt)가 좋았음
+        # learning_rate와 n_estimators는 각각 0.1, 1000이 가장 높은 Acc
+        # max_bin과 num_leaves는 미세하게 조정했을 때, 살짝의 Acc 향상이 있었음..
+        # max_depth, min_data_in_leaf는 조정 안하는 것이 가장 나았다.
+
     elif select == "Logistic":
-        model = LogisticRegression(max_iter=1000)
+        model = LogisticRegression(max_iter=200, C=5)
         model.fit(train_vec, train_y)
+        # max_iter 값은 200 이상부터는 Acc가 거의 동일함 200, 1000, 2000 등
+        # cost function C 1) C=1 Acc: 0.9760091705559649
+        #                 2) C=5 Acc: 0.9914844837468272 가 가장 적당할 듯
+        #                 3) C=10 Acc: 0.9930402030623107
+
     elif select == "SGD":
-        model = SGDClassifier()
+        model = SGDClassifier(loss='perceptron', alpha=0.00001)
         model.fit(train_vec, train_y)
+        # loss function 1) 확률적 경사하강법 적용 퍼셉트론 perceoptron Acc: 0.9883730451158601
+        #               2) 확률적 경사하강법 적용 SVM hinge Acc: 0.9759272905919921
+        #               3) 확률적 경사하강법 적용 로지스틱 회귀 log Acc: 0.9647916154916892
+
+        # alpha 1) 0.00001 Acc: 0.9912388438549087
+        #       2) 0.0005 Acc: 0.9838696470973552
+        #       3) 0.0001 Acc: 0.9873086055842135
+        #       4) 0.001 Acc: 0.9810857283222796
 
     return model
 
@@ -91,7 +114,10 @@ def test(test_y, test_vec, output, model):
 
     print("")
     print(model, "Acc:", accuracy_score(test_y, pred))
-    print(model, "F1 socre :", f1_score(test_y, pred))
+    print(model, "F1 score :", f1_score(test_y, pred))
+
+    # fig, ax = plt.subplots(figsize=(10, 12))
+    # plot_importance(output, ax=ax)
 
     return pred
 
@@ -99,6 +125,8 @@ def test(test_y, test_vec, output, model):
 def run():
     ############### 실행 코드 #######################
     train_x, train_y = dataset('', 'train') # 경로 자기껄로 맞추기
+    # print(len(train_x)) # 48852
+    # print(len(train_y)) # 48852
     print("Success train dataset loading")
     test_x, test_y = dataset('', 'test')
     print("Success test dataset loading")
@@ -135,23 +163,23 @@ def run():
     ################ 실행 결과 #######################
 
     '''
-    Random Forest Acc: 0.9640546958159338
-    Random Forest F1 socre : 0.9572915653273664
+    Random Forest Acc: 0.9647916154916892
+    Random Forest F1 score : 0.9581874756903929
 
     SVM Acc: 0.9945959223777942
-    SVM F1 socre : 0.993382795267696
+    SVM F1 score : 0.993382795267696
 
-    Decision Tree Acc: 0.9656104151314173
-    Decision Tree F1 socre : 0.95892822217876
+    Decision Tree Acc: 0.9671661344469008
+    Decision Tree F1 score : 0.9608053953670218
 
-    LigthGBM Acc: 0.9558666994186522
-    LigthGBM F1 socre : 0.9460298387904276
+    LigthGBM Acc: 0.9694587734381397
+    LigthGBM F1 score : 0.9634922188509347
 
-    Logistic Acc: 0.9760091705559649
-    Logistic F1 socre : 0.9705557230429103
+    Logistic Acc: 0.9914844837468272
+    Logistic F1 score : 0.9895351177299255
 
-    SGD Acc: 0.9760091705559649
-    SGD F1 socre : 0.9702930142958531
+    SGD Acc: 0.990665684107099
+    SGD F1 score : 0.9885265700483091
     '''
 
     ################ (+++) #######################
@@ -159,8 +187,6 @@ def run():
     # 1) 99가 안나온 모델의 파라미터를 바꾸거나 수정하면서 Acc를 높여도 될 것 같고,
     # 2) 혹은 내가 더 좋은 모델이 있어서 추가하고 싶다면 추가해서 결과를 봐도 좋을 것 같다.
     # 3) README.md 파일을 통해서 사용한 모델은 어떤 모델인지 간략하게 설명하고, 왜 사용하게 됐는지..?를 얘기해도 좋을 듯..
-    # 4) Acc 99 나왔으니 그만하자..
-    # 5) 딥러닝 도전...???
 
 if __name__=="__main__":
     run()
