@@ -23,16 +23,20 @@ GitHub : https://github.com/jiyoony
 -----
 ### HTTP DATASET CSIC 2010
 
-    HTTP DATASET CSIC 2010에는 자동으로 생성된 수천 개의 웹 요청이 포함되어 있습니다. 웹 공격 방지 시스템 테스트에 사용할 수 있습니다. CSIC의 정보 보안 연구소에서 개발되었습니다.
+    HTTP DATASET CSIC 2010에는 자동으로 생성된 수천 개의 웹 요청이 포함되어 있습니다. 
+    웹 공격 방지 시스템 테스트에 사용할 수 있습니다. CSIC의 정보 보안 연구소에서 개발되었습니다.
     
 출처 - https://www.tic.itefi.csic.es/dataset/
 
 -----
 ### 머신러닝 알고리즘
 
-    머신러닝은 지도 학습(Supervised Learning), 비지도 학습(Unsupervised Learning), 강화 학습(Reinforcement Learning)으로 구분됩니다.
+    머신러닝은 지도 학습(Supervised Learning), 비지도 학습(Unsupervised Learning), 
+    강화 학습(Reinforcement Learning)으로 구분됩니다.
 
-    그 중 지도 학습과 비지도 학습의 차이점은 학습 결과에 대한 사전 지식의 존재 유무입니다. 지도 학습은 학습 결과에 대한 사전 지식이 존재하므로 분류(classification)와 회귀(regression)가 가능하고, 비지도 학습은 학습 결과에 대한 사전 지식이 존재하지 않으므로 비슷한 데이터들을 군집화 하여 결과를 예측합니다.  
+    그 중 지도 학습과 비지도 학습의 차이점은 학습 결과에 대한 사전 지식의 존재 유무입니다. 
+    지도 학습은 학습 결과에 대한 사전 지식이 존재하므로 분류(classification)와 회귀(regression)가 가능하고, 
+    비지도 학습은 학습 결과에 대한 사전 지식이 존재하지 않으므로 비슷한 데이터들을 군집화 하여 결과를 예측합니다.  
 
 
 이번 프로젝트에서 활용한 지도 학습의 알고리즘은 다음과 같습니다.
