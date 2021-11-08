@@ -61,6 +61,8 @@ GitHub : https://github.com/jiyoony
     
     하지만 이 방법으로 트리를 계속해서 분할하게 되면 균형 트리 분할 방식보다 예측 오류 손실을 최소화할 수 있습니다.
 
+    Light GBM은 말 그대로 가볍고 속도가 빠르다는 장점이 있습니다. Light GBM은 큰 사이즈의 데이터를 다룰 수 있고 실행시킬 때 적은 메모리를 차지합니다.
+
 5. **SVM(Support Vector Machine, 서포트 벡터 머신)**
 
     SVM은 주어진 데이터 집합을 바탕으로 하여 새로운 데이터가 어느 카테고리에 속할지 판단하는 비확률적 이진 선형 분류 모델을 만듭니다. 만들어진 분류 모델은 데이터가 사상된 공간에서 경계로 표현되는데 그 중 가장 큰 폭을 가진 경계를 찾는 알고리즘입니다.
@@ -132,7 +134,7 @@ def vectorize(train_x,test_x): # 문장을 벡터로 만듭니다 해당 코드�
 ```
 
 ```python
-def train(train_vec, train_y, select): # 랜덤 포레스트로 훈련 시킵니다. 모델을 바꾸고 싶다면 이 함수를 변경해야 합니다.
+def train(train_vec, train_y, select): # 모델 훈련시키는 함수
     if select == "Random Forest":
         model = RandomForestClassifier(n_estimators=100, max_depth=350)
         model.fit(train_vec, train_y)
@@ -153,8 +155,8 @@ def train(train_vec, train_y, select): # 랜덤 포레스트로 훈련 시킵니
         model.fit(train_vec, train_y)
         # boosting_type은 goss, dart보다 default(gbdt)가 좋았음
         # learning_rate와 n_estimators는 각각 0.1, 1000이 가장 높은 Acc
-        # max_bin과 num_leaves는 미세하게 조정했을 때, 살짝의 Acc 향상이 있었음..
-        # max_depth, min_data_in_leaf는 조정 안하는 것이 가장 나았다.
+        # max_bin과 num_leaves는 미세하게 조정했을 때, 살짝의 Acc 향상이 있었음
+        # max_depth, min_data_in_leaf는 조정 안 한 default값이 가장 좋았음
 
     elif select == "Logistic":
         model = LogisticRegression(max_iter=200, C=5)
@@ -180,7 +182,7 @@ def train(train_vec, train_y, select): # 랜덤 포레스트로 훈련 시킵니
 ```
 
 ```python
-def test(test_y, test_vec, output, model): # 입렵 받은 테스트와 모델로 테스트를 실시합니다
+def test(test_y, test_vec, output, model): # 입력 받은 테스트와 모델로 테스트를 실시합니다.
     pred = output.predict(test_vec)
 
     print("")
@@ -271,3 +273,6 @@ def run():
     SGD Acc: 0.990665684107099
     SGD F1 score : 0.9885265700483091
 ```
+
+- SVM 모델의 경우에는 default 값으로 학습한 Acc 99가 나왔다.
+- LigthGBM, Logistic regression, 그리고 SGD 모델의 경우에는 default 값으로 학습한 Acc는 95~96 였는데, parameter tuning한 결과 Acc 99가 나왔다.
