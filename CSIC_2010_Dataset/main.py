@@ -43,16 +43,16 @@ def parsing(path):
 
 
 def dataset(path, mod='train'):
-    x = parsing(f'{path}norm_{mod}.txt')
-    y = [0] * len(x)
+    x = parsing(f'{path}norm_{mod}.txt') # 데이터셋을 생성합니다. 파싱한 데이터와 라벨을 생성합니다 
+    y = [0] * len(x) # 데이터셋을 생성합니다. 파싱한 데이터와 라벨을 생성합니다 
     
-    x += parsing(f'{path}anomal_{mod}.txt')
-    y += [1] * (len(x) - len(y))
+    x += parsing(f'{path}anomal_{mod}.txt') # 정상 라벨 0 을 정상 데이터 개수 만큼 생성
+    y += [1] * (len(x) - len(y)) # 비정상 라벨 1을 비정상 데이터 개수 만큼 생성
     
     return x, y
 
 
-def vectorize(train_x,test_x):
+def vectorize(train_x,test_x): # 문장을 벡터로 만듭니다 해당 코드에서는 기본적인 tf idf를 사용하고 있습니다.
     tf = TfidfVectorizer()
     tf = tf.fit(train_x)
 
@@ -62,7 +62,7 @@ def vectorize(train_x,test_x):
     return train_vec,test_vec
 
 
-def train(train_vec, train_y, select):
+def train(train_vec, train_y, select): # 랜덤 포레스트로 훈련 시킵니다. 모델을 바꾸고 싶다면 이 함수를 변경해야 합니다.
     if select == "Random Forest":
         model = RandomForestClassifier(n_estimators=100, max_depth=350)
         model.fit(train_vec, train_y)
@@ -109,26 +109,37 @@ def train(train_vec, train_y, select):
     return model
 
 
-def test(test_y, test_vec, output, model):
+def test(test_y, test_vec, output, model): # 입렵 받은 테스트와 모델로 테스트를 실시합니다
     pred = output.predict(test_vec)
 
     print("")
     print(model, "Acc:", accuracy_score(test_y, pred))
     print(model, "F1 score :", f1_score(test_y, pred))
 
-    # fig, ax = plt.subplots(figsize=(10, 12))
-    # plot_importance(output, ax=ax)
+    # lightgbm plot_importance 코드
+    # # 모델에서 feature가 사용된 횟수
+    # ax = lgb.plot_importance(output, max_num_features=15, importance_type='split')
+    # ax.set(title=f'Feature Importance (split)',
+	#        xlabel='Feature Importance',
+	#        ylabel='Features')
+
+    # # total gains of splits which use the feature, 해당 feature의 상대적 기여도를 의미
+    # ax = lgb.plot_importance(output, max_num_features=15, importance_type='gain')
+    # ax.set(title=f'Feature Importance (gain)',
+	#        xlabel='Feature Importance',
+	#        ylabel='Features')
+    # plt.show()
 
     return pred
 
 
 def run():
     ############### 실행 코드 #######################
-    train_x, train_y = dataset('', 'train') # 경로 자기껄로 맞추기
+    train_x, train_y = dataset('./data/', 'train') # 경로 자기껄로 맞추기
     # print(len(train_x)) # 48852
     # print(len(train_y)) # 48852
     print("Success train dataset loading")
-    test_x, test_y = dataset('', 'test')
+    test_x, test_y = dataset('./data/', 'test')
     print("Success test dataset loading")
 
     train_vec, test_vec = vectorize(train_x, test_x)
@@ -181,12 +192,6 @@ def run():
     SGD Acc: 0.990665684107099
     SGD F1 score : 0.9885265700483091
     '''
-
-    ################ (+++) #######################
-    # 모델만 바꿔도 Acc가 99가 나와서.. 앞으로 뭘 해야할지 생각해봤는데
-    # 1) 99가 안나온 모델의 파라미터를 바꾸거나 수정하면서 Acc를 높여도 될 것 같고,
-    # 2) 혹은 내가 더 좋은 모델이 있어서 추가하고 싶다면 추가해서 결과를 봐도 좋을 것 같다.
-    # 3) README.md 파일을 통해서 사용한 모델은 어떤 모델인지 간략하게 설명하고, 왜 사용하게 됐는지..?를 얘기해도 좋을 듯..
 
 if __name__=="__main__":
     run()
